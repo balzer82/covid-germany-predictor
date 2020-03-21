@@ -1,17 +1,9 @@
 #!/usr/bin/env python#!/usr/bin/python
 # coding: utf-8
 
-# In[1]:
+# In[78]:
 
 
-from bokeh.plotting import figure
-from bokeh.models.formatters import DatetimeTickFormatter
-from bokeh.models import BoxAnnotation
-from bokeh.models import Div
-from bokeh.layouts import column
-from bokeh.io import output_file, save
-import numpy as np
-from sklearn.linear_model import LinearRegression
 import pandas as pd
 
 
@@ -20,15 +12,15 @@ plt.style.use('bmh')
 
 
 # # WirVsVirus Hackathon
-#
+# 
 # Die entscheidende Frage bei der Beurteilung aller Maßnahmen ist, ob das exponentielle Wachstum verlangsamt worden ist, d.h. die exponentielle Wachstumskurve abflacht.
 # Dazu macht man am besten anhand bestehender Daten ein Modell-Fit und schaut, ob aktuelle Fallzahlen das Modell überschreiten oder man mit den Fallzahlen darunter bleibt.
 
 # ## Download Data from CSSE COVID-19 Dataset
-#
+# 
 # We are using the Covid-19 Dataset: https://github.com/CSSEGISandData/COVID-19
 
-# In[2]:
+# In[79]:
 
 
 url = 'https://raw.githubusercontent.com'
@@ -37,13 +29,13 @@ url += '/master/csse_covid_19_data/csse_covid_19_time_series'
 url += '/time_series_19-covid-Confirmed.csv'
 
 
-# In[3]:
+# In[80]:
 
 
 confirmed = pd.read_csv(url)
 
 
-# In[4]:
+# In[81]:
 
 
 confirmed.head()
@@ -51,36 +43,42 @@ confirmed.head()
 
 # ### Preprocessing
 
-# In[5]:
+# In[82]:
 
 
-ger_confirmed = confirmed[confirmed['Country/Region'] == 'Germany'].T
+ger_confirmed = confirmed[confirmed['Country/Region']=='Germany'].T
 ger_confirmed = ger_confirmed[4:].astype('int')
 ger_confirmed.columns = ['confirmed']
 
 
-# In[6]:
+# In[83]:
 
 
 ger_confirmed.index = pd.to_datetime(ger_confirmed.index)
 ger_confirmed = ger_confirmed.asfreq('D')
 
 
-# In[7]:
+# In[84]:
 
 
-ger_confirmed = ger_confirmed[ger_confirmed.confirmed > 100]
+ger_confirmed = ger_confirmed[ger_confirmed.confirmed>100]
+
+
+# In[85]:
+
+
+today = ger_confirmed.index[-1]
 
 
 # ## Feature
 
-# In[8]:
+# In[86]:
 
 
 ger_confirmed['days'] = (ger_confirmed.index - ger_confirmed.index.min()).days
 
 
-# In[9]:
+# In[87]:
 
 
 ger_confirmed.head()
@@ -88,10 +86,14 @@ ger_confirmed.head()
 
 # ## Prediction Model
 
-# In[10]:
+# In[88]:
 
 
-# In[11]:
+from sklearn.linear_model import LinearRegression
+import numpy as np
+
+
+# In[89]:
 
 
 X = ger_confirmed['days'].values.reshape(-1, 1)
@@ -101,29 +103,40 @@ logy = np.log(y)
 
 # ### Train
 
-# In[12]:
+# In[90]:
 
 
 clf = LinearRegression()
 clf.fit(X, logy)
 
 
-# In[13]:
+# In[91]:
 
 
 logy_pred = clf.predict(X)
 ger_confirmed['predicted'] = np.exp(logy_pred).astype('int')
 
 
+# ## Save the model for later use
+
+# In[95]:
+
+
+import pickle
+
+with open('%s-Germany-Covid19-Prediction-Model.pkl' % today.strftime('%Y-%m-%d'), 'wb') as f:
+    pickle.dump(clf, f)
+
+
 # ## Future
 
-# In[17]:
+# In[96]:
 
 
-fd = 7  # days into the future
+fd = 13 # days into the future
 
 
-# In[18]:
+# In[97]:
 
 
 # Create DataFrame in the Future
@@ -133,7 +146,7 @@ days_in_future = ger_confirmed.days[-1] + np.arange(1, fd)
 future = pd.DataFrame(data=days_in_future, index=dates, columns=['days'])
 
 
-# In[19]:
+# In[98]:
 
 
 ger_future = ger_confirmed.append(future, sort=True)
@@ -141,13 +154,13 @@ ger_future = ger_confirmed.append(future, sort=True)
 
 # ### Predict the Future
 
-# In[20]:
+# In[99]:
 
 
 X_future = ger_future['days'].values.reshape(-1, 1)
 
 
-# In[21]:
+# In[100]:
 
 
 logy_pred = clf.predict(X_future)
@@ -156,37 +169,44 @@ ger_future['predicted'] = np.exp(logy_pred).astype('int')
 
 # ## Future Plot
 
-# In[22]:
+# In[101]:
 
 
-today = ger_confirmed.index[-1]
 title = 'Bestätigte Fälle und Vorhersage für Deutschland (Basierend auf CSSE COVID-19 Dataset)'
 
 
-# In[23]:
+# In[102]:
 
 
 ax = ger_future['confirmed'].plot(label='Bestätigte Fälle', marker='o')
-ax = ger_future['predicted'].plot(label='exponentielles Wachstum', alpha=0.6, ax=ax)
+ax = ger_future['predicted'].plot(label='exponentielles Wachstum\n(Modell vom %s)' % today.strftime('%d.%m.%Y'),
+                                  alpha=0.6, ax=ax)
 
-ax.vlines(x=today, ymin=0, ymax=ger_future.predicted.max(), alpha=.1, linestyle='--')
 ax.legend()
-ax.set_ylabel('Personen')
+ax.set_ylabel('Personen');
 ax.set_yscale('log')
-ax.set_title(title, fontsize=8)
+ax.set_title(title, fontsize=8);
 
 plt.tight_layout()
 plt.savefig('./%s-Germany-Covid19-Prediction.png' % today.strftime('%Y-%m-%d'), dpi=150)
 plt.close()
 
 # # Interactive Website
-#
+# 
 # We are using Bokeh to export an interactive website
 
-# In[24]:
+# In[103]:
 
 
-# In[25]:
+from bokeh.plotting import figure
+from bokeh.models.formatters import DatetimeTickFormatter
+from bokeh.models import BoxAnnotation
+from bokeh.models import Div
+from bokeh.layouts import column
+from bokeh.io import output_file, save
+
+
+# In[104]:
 
 
 p = figure(plot_width=1280, plot_height=720,
@@ -194,29 +214,28 @@ p = figure(plot_width=1280, plot_height=720,
            title=title)
 
 p.line(ger_future.index, ger_future.predicted, line_width=5,
-       legend='exponentielles Wachstum')
+       legend='exponentielles Wachstum\n(Modell vom %s)' % today.strftime('%d.%m.%Y'))
 
 p.circle(ger_confirmed.index, ger_confirmed.confirmed,
          fill_color="white", size=12, legend='Bestätigte Fälle')
 
-p.xaxis.formatter = DatetimeTickFormatter(
+p.xaxis.formatter=DatetimeTickFormatter(
     years="%d.%m.%Y",
     months="%d.%m.%Y",
     days="%A %d.%m.%Y",
 )
 
 gray_box = BoxAnnotation(left=ger_confirmed.index[0],
-                         right=ger_confirmed.index[-1],
-                         fill_color='gray', fill_alpha=0.1)
+                          right=ger_confirmed.index[-1],
+                          fill_color='gray', fill_alpha=0.1)
 p.add_layout(gray_box)
 
 p.legend.location = "top_left"
 
 div = Div(text="""Quellcode: <a href="https://github.com/balzer82/covid-germany-predictor">Covid Germany Predictor</a> unter CC-BY2.0 Lizenz on Github.""",
-          width=600, height=100)
+width=600, height=100)
 
 output_file("index.html")
-save(column(p, div), title='COVID-19 Germany Prediction')
-
+save(column(p, div))
 
 # CC-BY 2.0 Paul Balzer
