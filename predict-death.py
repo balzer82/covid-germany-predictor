@@ -1,7 +1,7 @@
 #!/usr/bin/env python#!/usr/bin/python
 # coding: utf-8
 
-# In[1]:
+# In[74]:
 
 
 import pandas as pd
@@ -20,7 +20,7 @@ plt.style.use('bmh')
 # 
 # We are using the Covid-19 Dataset: https://github.com/CSSEGISandData/COVID-19
 
-# In[2]:
+# In[75]:
 
 
 url = 'https://raw.githubusercontent.com'
@@ -29,13 +29,13 @@ url += '/master/csse_covid_19_data/csse_covid_19_time_series'
 url += '/time_series_19-covid-Deaths.csv'
 
 
-# In[3]:
+# In[76]:
 
 
 deaths = pd.read_csv(url)
 
 
-# In[4]:
+# In[77]:
 
 
 deaths.head()
@@ -43,7 +43,7 @@ deaths.head()
 
 # ### Preprocessing
 
-# In[5]:
+# In[78]:
 
 
 ger_deaths = deaths[deaths['Country/Region']=='Germany'].T
@@ -51,20 +51,22 @@ ger_deaths = ger_deaths[4:].astype('int')
 ger_deaths.columns = ['deaths']
 
 
-# In[6]:
+# In[79]:
 
 
 ger_deaths.index = pd.to_datetime(ger_deaths.index)
 ger_deaths = ger_deaths.asfreq('D')
 
 
-# In[7]:
+# Filter der Daten: Wir nehmen für die Modellbildung erst den Tag als Beginn, an dem der 10. Tote gemeldet wurde.
+
+# In[80]:
 
 
-ger_deaths = ger_deaths[ger_deaths.deaths>0]
+ger_deaths = ger_deaths[ger_deaths.deaths >= 10]
 
 
-# In[8]:
+# In[81]:
 
 
 today = ger_deaths.index[-1]
@@ -72,34 +74,28 @@ today = ger_deaths.index[-1]
 
 # ## Feature
 
-# In[9]:
+# In[82]:
 
 
 ger_deaths['days'] = (ger_deaths.index - ger_deaths.index.min()).days
 
 
-# In[10]:
+# In[83]:
 
 
 ger_deaths.head()
 
 
-# In[11]:
-
-
-ger_deaths.deaths.plot();
-
-
 # ## Prediction Model
 
-# In[12]:
+# In[84]:
 
 
 from sklearn.linear_model import LinearRegression
 import numpy as np
 
 
-# In[13]:
+# In[85]:
 
 
 X = ger_deaths['days'].values.reshape(-1, 1)
@@ -109,21 +105,21 @@ logy = np.log(y)
 
 # ### Train
 
-# In[14]:
+# In[86]:
 
 
 clf = LinearRegression()
 clf.fit(X, logy)
 
 
-# In[15]:
+# In[87]:
 
 
 logy_pred = clf.predict(X)
 ger_deaths['predicted'] = np.exp(logy_pred).astype('int')
 
 
-# In[16]:
+# In[88]:
 
 
 ger_deaths.tail()
@@ -131,13 +127,13 @@ ger_deaths.tail()
 
 # ## Future
 
-# In[17]:
+# In[89]:
 
 
 fd = 13 # days into the future
 
 
-# In[18]:
+# In[90]:
 
 
 # Create DataFrame in the Future
@@ -147,7 +143,7 @@ days_in_future = ger_deaths.days[-1] + np.arange(1, fd)
 future = pd.DataFrame(data=days_in_future, index=dates, columns=['days'])
 
 
-# In[19]:
+# In[91]:
 
 
 ger_future = ger_deaths.append(future, sort=True)
@@ -155,20 +151,20 @@ ger_future = ger_deaths.append(future, sort=True)
 
 # ### Predict the Future
 
-# In[20]:
+# In[92]:
 
 
 X_future = ger_future['days'].values.reshape(-1, 1)
 
 
-# In[21]:
+# In[93]:
 
 
 logy_pred = clf.predict(X_future)
 ger_future['predicted'] = np.exp(logy_pred).astype('int')
 
 
-# In[26]:
+# In[94]:
 
 
 ger_future
@@ -176,13 +172,13 @@ ger_future
 
 # ## Future Plot
 
-# In[22]:
+# In[95]:
 
 
 title = 'Todesfälle und Vorhersage für Deutschland (Basierend auf CSSE COVID-19 Dataset)'
 
 
-# In[25]:
+# In[96]:
 
 
 ax = ger_future['deaths'].plot(label='Bestätigte COVID-19 Tote', marker='o')
@@ -201,7 +197,7 @@ plt.savefig('./%s-Germany-Covid19-Death-Prediction.png' % today.strftime('%Y-%m-
 
 # ## Export as Excel
 
-# In[24]:
+# In[97]:
 
 
 ger_future.to_excel('./%s-Germany-Covid19-Death-Prediction.xlsx' % today.strftime('%Y-%m-%d'))

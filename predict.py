@@ -58,10 +58,12 @@ ger_confirmed.index = pd.to_datetime(ger_confirmed.index)
 ger_confirmed = ger_confirmed.asfreq('D')
 
 
+# Filter der Daten: Wir nehmen für die Modellbildung erst den Tag als Beginn, an dem der 100. Erkrankte gemeldet wurde.
+
 # In[8]:
 
 
-ger_confirmed = ger_confirmed[ger_confirmed.confirmed>100]
+ger_confirmed = ger_confirmed[ger_confirmed.confirmed>=100]
 
 
 # In[9]:
