@@ -27,6 +27,7 @@ url = 'https://raw.githubusercontent.com'
 url += '/CSSEGISandData/COVID-19'
 url += '/master/csse_covid_19_data/csse_covid_19_time_series'
 url += '/time_series_19-covid-Confirmed.csv'
+print('Downloading from %s' % url)
 
 
 # In[3]:
@@ -86,16 +87,47 @@ ger_confirmed['days'] = (ger_confirmed.index - ger_confirmed.index.min()).days
 ger_confirmed.head()
 
 
-# ## Prediction Model
+# ## Ausgangssperren
+# 
+# Am Wochenende 20.03./21.03.2020 haben einige Gemeinden und Städte Ausgangssperren verhängt (z.B. [Dresden](https://www.dresden.de/media/pdf/presseamt/Allgemeinverfuegung.pdf), Mitterteich, ganz Bayern usw). Daher werden wir uns das Datum mal merken.
 
 # In[11]:
+
+
+import time
+import datetime
+
+
+# In[12]:
+
+
+ausgangssperren_timestamp = datetime.date(2020, 3, 21)
+
+
+# In[13]:
+
+
+ausgangssperren_timestamp_epoch = time.mktime(ausgangssperren_timestamp.timetuple())*1000
+
+
+# ## Prediction Model
+# 
+# Ein exponentielles Wachstum (freie Ansteckung) verläuft nach:
+# 
+# $y = A e^{Bx}$
+# 
+# Wenn wir das logarithmieren mit dem Log zur Basis $e$, haben wir ein lineares Modell.
+# 
+# $\log_e(y) = B x + \log_e (A)$
+
+# In[14]:
 
 
 from sklearn.linear_model import LinearRegression
 import numpy as np
 
 
-# In[12]:
+# In[15]:
 
 
 X = ger_confirmed['days'].values.reshape(-1, 1)
@@ -105,46 +137,65 @@ logy = np.log(y)
 
 # ### Train
 
-# In[13]:
+# In[16]:
 
 
 clf = LinearRegression()
 clf.fit(X, logy)
 
 
-# In[14]:
+# In[17]:
 
 
 logy_pred = clf.predict(X)
+
+
+# Die mit dem linearen Modell vorhergesagten Werte sind im logarithmischen, müssen mit der $e^y$ noch zurück konvertiert werden.
+
+# In[18]:
+
+
 ger_confirmed['predicted'] = np.exp(logy_pred).astype('int')
 
 
-# In[15]:
+# In[19]:
 
 
 ger_confirmed.tail()
 
 
+# ### Modelparameter
+
+# In[20]:
+
+
+B = clf.coef_[0]
+A = np.exp(clf.intercept_)
+print('Modellparameter sind A=%.1f, B=%.3f' % (A, B))
+
+
 # ## Save the model for later use
 
-# In[16]:
+# In[21]:
 
 
 import pickle
 
 with open('%s-Germany-Covid19-Prediction-Model.pkl' % today.strftime('%Y-%m-%d'), 'wb') as f:
     pickle.dump(clf, f)
+    
+print('Saved the Model')
 
 
 # ## Future
 
-# In[17]:
+# In[22]:
 
 
 fd = 13 # days into the future
 
 
-# In[18]:
+# In[23]:
 
 
 # Create DataFrame in the Future
@@ -154,7 +205,7 @@ days_in_future = ger_confirmed.days[-1] + np.arange(1, fd)
 future = pd.DataFrame(data=days_in_future, index=dates, columns=['days'])
 
 
-# In[19]:
+# In[24]:
 
 
 ger_future = ger_confirmed.append(future, sort=True)
@@ -162,20 +213,20 @@ ger_future = ger_confirmed.append(future, sort=True)
 
 # ### Predict the Future
 
-# In[20]:
+# In[25]:
 
 
 X_future = ger_future['days'].values.reshape(-1, 1)
 
 
-# In[21]:
+# In[26]:
 
 
 logy_pred = clf.predict(X_future)
 ger_future['predicted'] = np.exp(logy_pred).astype('int')
 
 
-# In[22]:
+# In[27]:
 
 
 ger_future
@@ -183,18 +234,23 @@ ger_future
 
 # ## Future Plot
 
-# In[23]:
+# In[28]:
 
 
 title = 'Bestätigte Fälle und Vorhersage für Deutschland (Basierend auf CSSE COVID-19 Dataset)'
 
 
-# In[24]:
+# In[29]:
 
 
 ax = ger_future['confirmed'].plot(label='Bestätigte COVID-19 Fälle', marker='o')
 ax = ger_future['predicted'].plot(label='exponentielles Wachstum\n(Modell vom %s)' % today.strftime('%d.%m.%Y'),
                                   alpha=0.6, ax=ax)
+
+ax.vlines(ausgangssperren_timestamp,
+          ymin=ger_future.predicted.min(),
+          ymax=ger_future.predicted.max(),
+          linestyle='--', alpha=0.2, label='Beginn Ausgangssperren')
 
 ax.legend()
 ax.set_ylabel('Log(Anzahl)')
@@ -204,31 +260,33 @@ ax.annotate('unter CC-BY 2.0 Lizenz Paul Balzer', xy=(.5, 0.02), xycoords='figur
 
 plt.tight_layout()
 plt.savefig('./%s-Germany-Covid19-Prediction.png' % today.strftime('%Y-%m-%d'), dpi=150)
+print('Saved the Figure')
 
 
 # ## Export as Excel
 
-# In[25]:
+# In[30]:
 
 
 ger_future.to_excel('./%s-Germany-Covid19-Prediction.xlsx' % today.strftime('%Y-%m-%d'))
+print('Saved the Excel')
 
 
 # # Interactive Website
 # 
 # We are using Bokeh to export an interactive website
 
-# In[26]:
+# In[31]:
 
 
 from bokeh.plotting import figure
 from bokeh.models.formatters import DatetimeTickFormatter
-from bokeh.models import Div, HoverTool, BoxAnnotation
+from bokeh.models import Div, HoverTool, BoxAnnotation, Span
 from bokeh.layouts import column
 from bokeh.io import output_file, save
 
 
-# In[27]:
+# In[32]:
 
 
 p = figure(tools="hover,save,pan,box_zoom,reset,wheel_zoom",
@@ -250,9 +308,6 @@ p.xaxis.formatter=DatetimeTickFormatter(
     days="%A %d.%m.%Y",
 )
 
-# Legende
-p.legend.location = "top_left"
-
 # Daten-Zeitraum
 gray_box = BoxAnnotation(left=ger_confirmed.index[0],
                           right=ger_confirmed.index[-1],
@@ -267,13 +322,27 @@ p.select_one(HoverTool).tooltips = [
 p.select_one(HoverTool).formatters = {'x':'datetime'}
 p.select_one(HoverTool).mode = 'vline'
 
+# Vertical line for Ausgangssperren
+vline = Span(location=ausgangssperren_timestamp_epoch,
+             dimension='height', line_color='gray',
+             line_dash='dashed', line_width=3, name='Beginn Ausgangssperren')
+p.add_layout(vline)
+
+p.toolbar.autohide = True
+
+# Legende
+p.legend.location = "top_left"
+
 # Anmerkung
-div = Div(text="""Quellcode: <a href="https://github.com/balzer82/covid-germany-predictor">Covid Germany Predictor</a> unter CC-BY2.0 Lizenz on Github.""")
+div = Div(text="""Quellcode: <a href="https://github.com/balzer82/covid-germany-predictor">Covid Germany Predictor</a>
+            unter CC-BY2.0 Lizenz von Paul Balzer on Github.
+            Disclaimer: Ich bin kein Epidemiologe oder Virologe, also kein Experte!""")
 
 # Save
-output_file("./html/index.html", title='Covid19 Prediction Germany')
+output_file("./html/index.html", title='COVID-19 Prediction Germany')
 
 save(column(p, div, sizing_mode="stretch_both"))
+print('Saved the html')
 
 
 # CC-BY 2.0 Paul Balzer

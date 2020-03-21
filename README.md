@@ -8,7 +8,7 @@ Siehe NRD Podcast mit Prof. Drosten [#18 - Die Wirksamkeit von Ausgangssperren i
 
 ## Datenbasis
 
-Die Daten werden aus dem [2019 Novel Coronavirus COVID-19 (2019-nCoV) Data Repository by Johns Hopkins CSSE](https://github.com/CSSEGISandData/COVID-19) geladen.
+Die Daten werden aus dem [2019 Novel Coronavirus COVID-19 (2019-nCoV) Data Repository by Johns Hopkins CSSE](https://github.com/CSSEGISandData/COVID-19) geladen. Mit den Ansteckungszahlen wird ein exponentielles Modell trainiert, welches die Daten optimal abbildet. Damit werden Vorhersagen zur Verbreitung in den nächsten Tagen getroffen.
 
 ## Usage
 
