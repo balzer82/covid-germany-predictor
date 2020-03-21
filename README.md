@@ -14,8 +14,15 @@ Um eine neue Vorhersage zu generieren, einfach
 
 ausführen und eine neue Abbildung wird erstellt, sowohl als `.png` als auch als [index.html](index.html)
 
+## Serve the Figure
+
+```
+docker build webserver
+docker run -it -v $(pwd)/index.html:/usr/share/nginx/html/index.html -p 80:80 webserver
+```
 
 ### Requirements
 
 * Pandas
-* Bokeh (für HTML Generierung)
+* SciKit-Learn
+* Bokeh (für HTML)
