@@ -1,0 +1,87 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+  
+  <head>
+    
+      <meta charset="utf-8">
+      <title>Covid19 Prediction Germany</title>
+      
+      
+        
+          
+        <link rel="stylesheet" href="https://cdn.pydata.org/bokeh/release/bokeh-1.0.4.min.css" type="text/css" />
+        <link rel="stylesheet" href="https://cdn.pydata.org/bokeh/release/bokeh-widgets-1.0.4.min.css" type="text/css" />
+        
+        
+          
+        <script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-1.0.4.min.js"></script>
+        <script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-widgets-1.0.4.min.js"></script>
+        <script type="text/javascript">
+            Bokeh.set_log_level("info");
+        </script>
+        
+      
+      
+    
+  </head>
+  
+  
+  <body>
+    
+      
+        
+          
+          
+            
+              <div class="bk-root" id="5af60fb7-7af8-4ab5-880e-e86ff60d2383" data-root-id="1156"></div>
+            
+          
+        
+      
+      
+        <script type="application/json" id="1325">
+          {"5bbed375-81aa-40b0-ad4d-a50926d264f3":{"roots":{"references":[{"attributes":{"months":[0,4,8]},"id":"1057","type":"MonthsTicker"},{"attributes":{"callback":null},"id":"1004","type":"DataRange1d"},{"attributes":{},"id":"1027","type":"WheelZoomTool"},{"attributes":{"months":[0,6]},"id":"1058","type":"MonthsTicker"},{"attributes":{"line_alpha":0.1,"line_color":"#1f77b4","line_width":5,"x":{"field":"x"},"y":{"field":"y"}},"id":"1039","type":"Line"},{"attributes":{},"id":"1008","type":"LinearScale"},{"attributes":{},"id":"1059","type":"YearsTicker"},{"attributes":{"active_drag":"auto","active_inspect":"auto","active_multi":null,"active_scroll":"auto","active_tap":"auto","tools":[{"id":"1022","type":"HoverTool"},{"id":"1023","type":"SaveTool"},{"id":"1024","type":"PanTool"},{"id":"1025","type":"BoxZoomTool"},{"id":"1026","type":"ResetTool"},{"id":"1027","type":"WheelZoomTool"}]},"id":"1028","type":"Toolbar"},{"attributes":{"children":[{"id":"1154","type":"Div"}],"sizing_mode":"stretch_both"},"id":"1155","type":"WidgetBox"},{"attributes":{"items":[{"id":"1061","type":"LegendItem"},{"id":"1087","type":"LegendItem"}],"location":"top_left","plot":{"id":"1002","subtype":"Figure","type":"Plot"}},"id":"1060","type":"Legend"},{"attributes":{"bottom_units":"screen","fill_alpha":{"value":0.5},"fill_color":{"value":"lightgrey"},"left_units":"screen","level":"overlay","line_alpha":{"value":1.0},"line_color":{"value":"black"},"line_dash":[4,4],"line_width":{"value":2},"plot":null,"render_mode":"css","right_units":"screen","top_units":"screen"},"id":"1031","type":"BoxAnnotation"},{"attributes":{},"id":"1010","type":"LogScale"},{"attributes":{"data_source":{"id":"1037","type":"ColumnDataSource"},"glyph":{"id":"1038","type":"Line"},"hover_glyph":null,"muted_glyph":null,"nonselection_glyph":{"id":"1039","type":"Line"},"selection_glyph":null,"view":{"id":"1041","type":"CDSView"}},"id":"1040","type":"GlyphRenderer"},{"attributes":{"num_minor_ticks":5,"tickers":[{"id":"1048","type":"AdaptiveTicker"},{"id":"1049","type":"AdaptiveTicker"},{"id":"1050","type":"AdaptiveTicker"},{"id":"1051","type":"DaysTicker"},{"id":"1052","type":"DaysTicker"},{"id":"1053","type":"DaysTicker"},{"id":"1054","type":"DaysTicker"},{"id":"1055","type":"MonthsTicker"},{"id":"1056","type":"MonthsTicker"},{"id":"1057","type":"MonthsTicker"},{"id":"1058","type":"MonthsTicker"},{"id":"1059","type":"YearsTicker"}]},"id":"1013","type":"DatetimeTicker"},{"attributes":{"days":["%A %d.%m.%Y"],"months":["%d.%m.%Y"],"years":["%d.%m.%Y"]},"id":"1088","type":"DatetimeTickFormatter"},{"attributes":{"months":[0,2,4,6,8,10]},"id":"1056","type":"MonthsTicker"},{"attributes":{"line_color":"darkred","line_width":5,"x":{"field":"x"},"y":{"field":"y"}},"id":"1038","type":"Line"},{"attributes":{"formatter":{"id":"1088","type":"DatetimeTickFormatter"},"plot":{"id":"1002","subtype":"Figure","type":"Plot"},"ticker":{"id":"1013","type":"DatetimeTicker"}},"id":"1012","type":"DatetimeAxis"},{"attributes":{"callback":null,"data":{"x":{"__ndarray__":"AACARzYJd0IAAECtiAl3QgAAABPbCXdCAADAeC0Kd0IAAIDefwp3QgAAQETSCndCAAAAqiQLd0IAAMAPdwt3QgAAgHXJC3dCAABA2xsMd0IAAABBbgx3QgAAwKbADHdCAACADBMNd0IAAEByZQ13QgAAANi3DXdCAADAPQoOd0IAAICjXA53QgAAQAmvDndCAAAAbwEPd0IAAMDUUw93Qg==","dtype":"float64","shape":[20]},"y":[130,159,196,262,482,670,799,1040,1176,1457,1908,2078,3675,4585,5795,7272,9257,12327,15320,19848]},"selected":{"id":"1111","type":"Selection"},"selection_policy":{"id":"1110","type":"UnionRenderers"}},"id":"1062","type":"ColumnDataSource"},{"attributes":{"callback":null},"id":"1006","type":"DataRange1d"},{"attributes":{"fill_color":{"value":"lightblue"},"line_color":{"value":"#1f77b4"},"size":{"units":"screen","value":12},"x":{"field":"x"},"y":{"field":"y"}},"id":"1063","type":"Circle"},{"attributes":{"label":{"value":"exponentielles Wachstum\n(Modell vom 20.03.2020)"},"renderers":[{"id":"1040","type":"GlyphRenderer"}]},"id":"1061","type":"LegendItem"},{"attributes":{"ticker":null},"id":"1044","type":"LogTickFormatter"},{"attributes":{"plot":{"id":"1002","subtype":"Figure","type":"Plot"},"ticker":{"id":"1013","type":"DatetimeTicker"}},"id":"1016","type":"Grid"},{"attributes":{"fill_alpha":{"value":0.1},"fill_color":{"value":"#1f77b4"},"line_alpha":{"value":0.1},"line_color":{"value":"#1f77b4"},"size":{"units":"screen","value":12},"x":{"field":"x"},"y":{"field":"y"}},"id":"1064","type":"Circle"},{"attributes":{"children":[{"id":"1002","subtype":"Figure","type":"Plot"},{"id":"1155","type":"WidgetBox"}],"sizing_mode":"stretch_both"},"id":"1156","type":"Column"},{"attributes":{"data_source":{"id":"1062","type":"ColumnDataSource"},"glyph":{"id":"1063","type":"Circle"},"hover_glyph":null,"muted_glyph":null,"nonselection_glyph":{"id":"1064","type":"Circle"},"selection_glyph":null,"view":{"id":"1066","type":"CDSView"}},"id":"1065","type":"GlyphRenderer"},{"attributes":{"formatter":{"id":"1044","type":"LogTickFormatter"},"plot":{"id":"1002","subtype":"Figure","type":"Plot"},"ticker":{"id":"1018","type":"LogTicker"}},"id":"1017","type":"LogAxis"},{"attributes":{"mantissas":[1,2,5],"max_interval":500.0,"num_minor_ticks":0},"id":"1048","type":"AdaptiveTicker"},{"attributes":{"num_minor_ticks":10},"id":"1018","type":"LogTicker"},{"attributes":{"source":{"id":"1062","type":"ColumnDataSource"}},"id":"1066","type":"CDSView"},{"attributes":{"dimension":1,"plot":{"id":"1002","subtype":"Figure","type":"Plot"},"ticker":{"id":"1018","type":"LogTicker"}},"id":"1021","type":"Grid"},{"attributes":{},"id":"1085","type":"UnionRenderers"},{"attributes":{"base":60,"mantissas":[1,2,5,10,15,20,30],"max_interval":1800000.0,"min_interval":1000.0,"num_minor_ticks":0},"id":"1049","type":"AdaptiveTicker"},{"attributes":{"base":24,"mantissas":[1,2,4,6,8,12],"max_interval":43200000.0,"min_interval":3600000.0,"num_minor_ticks":0},"id":"1050","type":"AdaptiveTicker"},{"attributes":{},"id":"1086","type":"Selection"},{"attributes":{"label":{"value":"Best\u00e4tigte COVID-19 F\u00e4lle"},"renderers":[{"id":"1065","type":"GlyphRenderer"}]},"id":"1087","type":"LegendItem"},{"attributes":{"days":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]},"id":"1051","type":"DaysTicker"},{"attributes":{"days":[1,4,7,10,13,16,19,22,25,28]},"id":"1052","type":"DaysTicker"},{"attributes":{"callback":null,"formatters":{"x":"datetime"},"mode":"vline","tooltips":[["Datum","@x{%d.%m.%Y}"],["F\u00e4lle","@y{0.0a}"]]},"id":"1022","type":"HoverTool"},{"attributes":{"sizing_mode":"stretch_both","text":"Quellcode: &lt;a href=\"https://github.com/balzer82/covid-germany-predictor\"&gt;Covid Germany Predictor&lt;/a&gt; unter CC-BY2.0 Lizenz on Github."},"id":"1154","type":"Div"},{"attributes":{"days":[1,8,15,22]},"id":"1053","type":"DaysTicker"},{"attributes":{"fill_alpha":{"value":0.1},"fill_color":{"value":"gray"},"left":1583020800000.0,"plot":{"id":"1002","subtype":"Figure","type":"Plot"},"right":1584662400000.0},"id":"1090","type":"BoxAnnotation"},{"attributes":{},"id":"1023","type":"SaveTool"},{"attributes":{"days":[1,15]},"id":"1054","type":"DaysTicker"},{"attributes":{},"id":"1024","type":"PanTool"},{"attributes":{},"id":"1110","type":"UnionRenderers"},{"attributes":{"below":[{"id":"1012","type":"DatetimeAxis"}],"left":[{"id":"1017","type":"LogAxis"}],"renderers":[{"id":"1012","type":"DatetimeAxis"},{"id":"1016","type":"Grid"},{"id":"1017","type":"LogAxis"},{"id":"1021","type":"Grid"},{"id":"1031","type":"BoxAnnotation"},{"id":"1060","type":"Legend"},{"id":"1040","type":"GlyphRenderer"},{"id":"1065","type":"GlyphRenderer"},{"id":"1090","type":"BoxAnnotation"}],"sizing_mode":"stretch_both","title":{"id":"1001","type":"Title"},"toolbar":{"id":"1028","type":"Toolbar"},"x_range":{"id":"1004","type":"DataRange1d"},"x_scale":{"id":"1008","type":"LinearScale"},"y_range":{"id":"1006","type":"DataRange1d"},"y_scale":{"id":"1010","type":"LogScale"}},"id":"1002","subtype":"Figure","type":"Plot"},{"attributes":{"source":{"id":"1037","type":"ColumnDataSource"}},"id":"1041","type":"CDSView"},{"attributes":{"callback":null,"data":{"x":{"__ndarray__":"AACARzYJd0IAAECtiAl3QgAAABPbCXdCAADAeC0Kd0IAAIDefwp3QgAAQETSCndCAAAAqiQLd0IAAMAPdwt3QgAAgHXJC3dCAABA2xsMd0IAAABBbgx3QgAAwKbADHdCAACADBMNd0IAAEByZQ13QgAAANi3DXdCAADAPQoOd0IAAICjXA53QgAAQAmvDndCAAAAbwEPd0IAAMDUUw93QgAAgDqmD3dCAABAoPgPd0IAAAAGSxB3QgAAwGudEHdCAACA0e8Qd0IAAEA3QhF3QgAAAJ2UEXdCAADAAucRd0IAAIBoORJ3QgAAQM6LEndCAAAANN4Sd0IAAMCZMBN3Qg==","dtype":"float64","shape":[32]},"y":[139,181,236,307,400,521,679,885,1152,1501,1955,2547,3317,4320,5627,7329,9546,12434,16194,21093,27472,35781,46603,60699,79057,102968,134110,174672,227502,296309,385928,502651]},"selected":{"id":"1086","type":"Selection"},"selection_policy":{"id":"1085","type":"UnionRenderers"}},"id":"1037","type":"ColumnDataSource"},{"attributes":{"months":[0,1,2,3,4,5,6,7,8,9,10,11]},"id":"1055","type":"MonthsTicker"},{"attributes":{"overlay":{"id":"1031","type":"BoxAnnotation"}},"id":"1025","type":"BoxZoomTool"},{"attributes":{},"id":"1111","type":"Selection"},{"attributes":{"plot":null,"text":"Best\u00e4tigte F\u00e4lle und Vorhersage f\u00fcr Deutschland (Basierend auf CSSE COVID-19 Dataset)"},"id":"1001","type":"Title"},{"attributes":{},"id":"1026","type":"ResetTool"}],"root_ids":["1156"]},"title":"Bokeh Application","version":"1.0.4"}}
+        </script>
+        <script type="text/javascript">
+          (function() {
+            var fn = function() {
+              Bokeh.safely(function() {
+                (function(root) {
+                  function embed_document(root) {
+                    
+                  var docs_json = document.getElementById('1325').textContent;
+                  var render_items = [{"docid":"5bbed375-81aa-40b0-ad4d-a50926d264f3","roots":{"1156":"5af60fb7-7af8-4ab5-880e-e86ff60d2383"}}];
+                  root.Bokeh.embed.embed_items(docs_json, render_items);
+                
+                  }
+                  if (root.Bokeh !== undefined) {
+                    embed_document(root);
+                  } else {
+                    var attempts = 0;
+                    var timer = setInterval(function(root) {
+                      if (root.Bokeh !== undefined) {
+                        embed_document(root);
+                        clearInterval(timer);
+                      }
+                      attempts++;
+                      if (attempts > 100) {
+                        console.log("Bokeh: ERROR: Unable to run BokehJS code because BokehJS library is missing");
+                        clearInterval(timer);
+                      }
+                    }, 10, root)
+                  }
+                })(window);
+              });
+            };
+            if (document.readyState != "loading") fn();
+            else document.addEventListener("DOMContentLoaded", fn);
+          })();
+        </script>
+    
+  </body>
+  
+</html>

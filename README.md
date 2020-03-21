@@ -12,14 +12,15 @@ Um eine neue Vorhersage zu generieren, einfach
 
 `python3 predict.py`
 
-ausführen und eine neue Abbildung wird erstellt, sowohl als `.png` als auch als [index.html](index.html)
+ausführen und eine neue Abbildung wird erstellt, sowohl als `.png` als auch als [/html/index.html](/html/index.html). Eine Excel Tabelle mit Vorhersage sowie das angelernte Modell wird nach Datum sortiert ebenfalls generiert.
 
-## Serve the Figure
+## Serve the (static) Figure
 
 ```
-docker build webserver
-docker run -it -v $(pwd)/index.html:/usr/share/nginx/html/index.html -p 80:80 webserver
+docker build -t webserver .
+docker run -it -v $(pwd)/html/index.html:/usr/share/nginx/html/index.html -p 80:80 webserver
 ```
+Now open your Browser and open http://localhost/
 
 ### Requirements
 

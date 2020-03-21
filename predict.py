@@ -1,7 +1,7 @@
 #!/usr/bin/env python#!/usr/bin/python
 # coding: utf-8
 
-# In[2]:
+# In[1]:
 
 
 import pandas as pd
@@ -20,7 +20,7 @@ plt.style.use('bmh')
 # 
 # We are using the Covid-19 Dataset: https://github.com/CSSEGISandData/COVID-19
 
-# In[3]:
+# In[2]:
 
 
 url = 'https://raw.githubusercontent.com'
@@ -29,13 +29,13 @@ url += '/master/csse_covid_19_data/csse_covid_19_time_series'
 url += '/time_series_19-covid-Confirmed.csv'
 
 
-# In[4]:
+# In[3]:
 
 
 confirmed = pd.read_csv(url)
 
 
-# In[5]:
+# In[4]:
 
 
 confirmed.head()
@@ -43,7 +43,7 @@ confirmed.head()
 
 # ### Preprocessing
 
-# In[6]:
+# In[5]:
 
 
 ger_confirmed = confirmed[confirmed['Country/Region']=='Germany'].T
@@ -51,7 +51,7 @@ ger_confirmed = ger_confirmed[4:].astype('int')
 ger_confirmed.columns = ['confirmed']
 
 
-# In[7]:
+# In[6]:
 
 
 ger_confirmed.index = pd.to_datetime(ger_confirmed.index)
@@ -60,13 +60,13 @@ ger_confirmed = ger_confirmed.asfreq('D')
 
 # Filter der Daten: Wir nehmen für die Modellbildung erst den Tag als Beginn, an dem der 100. Erkrankte gemeldet wurde.
 
-# In[8]:
+# In[7]:
 
 
 ger_confirmed = ger_confirmed[ger_confirmed.confirmed>=100]
 
 
-# In[9]:
+# In[8]:
 
 
 today = ger_confirmed.index[-1]
@@ -74,13 +74,13 @@ today = ger_confirmed.index[-1]
 
 # ## Feature
 
-# In[10]:
+# In[9]:
 
 
 ger_confirmed['days'] = (ger_confirmed.index - ger_confirmed.index.min()).days
 
 
-# In[11]:
+# In[10]:
 
 
 ger_confirmed.head()
@@ -88,14 +88,14 @@ ger_confirmed.head()
 
 # ## Prediction Model
 
-# In[12]:
+# In[11]:
 
 
 from sklearn.linear_model import LinearRegression
 import numpy as np
 
 
-# In[13]:
+# In[12]:
 
 
 X = ger_confirmed['days'].values.reshape(-1, 1)
@@ -105,21 +105,21 @@ logy = np.log(y)
 
 # ### Train
 
-# In[14]:
+# In[13]:
 
 
 clf = LinearRegression()
 clf.fit(X, logy)
 
 
-# In[15]:
+# In[14]:
 
 
 logy_pred = clf.predict(X)
 ger_confirmed['predicted'] = np.exp(logy_pred).astype('int')
 
 
-# In[16]:
+# In[15]:
 
 
 ger_confirmed.tail()
@@ -127,7 +127,7 @@ ger_confirmed.tail()
 
 # ## Save the model for later use
 
-# In[17]:
+# In[16]:
 
 
 import pickle
@@ -138,13 +138,13 @@ with open('%s-Germany-Covid19-Prediction-Model.pkl' % today.strftime('%Y-%m-%d')
 
 # ## Future
 
-# In[18]:
+# In[17]:
 
 
 fd = 13 # days into the future
 
 
-# In[19]:
+# In[18]:
 
 
 # Create DataFrame in the Future
@@ -154,7 +154,7 @@ days_in_future = ger_confirmed.days[-1] + np.arange(1, fd)
 future = pd.DataFrame(data=days_in_future, index=dates, columns=['days'])
 
 
-# In[20]:
+# In[19]:
 
 
 ger_future = ger_confirmed.append(future, sort=True)
@@ -162,20 +162,20 @@ ger_future = ger_confirmed.append(future, sort=True)
 
 # ### Predict the Future
 
-# In[21]:
+# In[20]:
 
 
 X_future = ger_future['days'].values.reshape(-1, 1)
 
 
-# In[22]:
+# In[21]:
 
 
 logy_pred = clf.predict(X_future)
 ger_future['predicted'] = np.exp(logy_pred).astype('int')
 
 
-# In[28]:
+# In[22]:
 
 
 ger_future
@@ -271,7 +271,7 @@ p.select_one(HoverTool).mode = 'vline'
 div = Div(text="""Quellcode: <a href="https://github.com/balzer82/covid-germany-predictor">Covid Germany Predictor</a> unter CC-BY2.0 Lizenz on Github.""")
 
 # Save
-output_file("index.html", title='Covid19 Prediction Germany')
+output_file("./html/index.html", title='Covid19 Prediction Germany')
 
 save(column(p, div, sizing_mode="stretch_both"))
 
