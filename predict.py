@@ -117,9 +117,15 @@ logy_pred = clf.predict(X)
 ger_confirmed['predicted'] = np.exp(logy_pred).astype('int')
 
 
+# In[15]:
+
+
+ger_confirmed.tail()
+
+
 # ## Save the model for later use
 
-# In[18]:
+# In[16]:
 
 
 import pickle
@@ -130,13 +136,13 @@ with open('%s-Germany-Covid19-Prediction-Model.pkl' % today.strftime('%Y-%m-%d')
 
 # ## Future
 
-# In[19]:
+# In[17]:
 
 
 fd = 13 # days into the future
 
 
-# In[20]:
+# In[18]:
 
 
 # Create DataFrame in the Future
@@ -146,7 +152,7 @@ days_in_future = ger_confirmed.days[-1] + np.arange(1, fd)
 future = pd.DataFrame(data=days_in_future, index=dates, columns=['days'])
 
 
-# In[21]:
+# In[19]:
 
 
 ger_future = ger_confirmed.append(future, sort=True)
@@ -154,13 +160,13 @@ ger_future = ger_confirmed.append(future, sort=True)
 
 # ### Predict the Future
 
-# In[22]:
+# In[20]:
 
 
 X_future = ger_future['days'].values.reshape(-1, 1)
 
 
-# In[23]:
+# In[21]:
 
 
 logy_pred = clf.predict(X_future)
@@ -169,16 +175,16 @@ ger_future['predicted'] = np.exp(logy_pred).astype('int')
 
 # ## Future Plot
 
-# In[24]:
+# In[22]:
 
 
 title = 'Bestätigte Fälle und Vorhersage für Deutschland (Basierend auf CSSE COVID-19 Dataset)'
 
 
-# In[25]:
+# In[23]:
 
 
-ax = ger_future['confirmed'].plot(label='Bestätigte Fälle', marker='o')
+ax = ger_future['confirmed'].plot(label='Bestätigte COVID-19 Fälle', marker='o')
 ax = ger_future['predicted'].plot(label='exponentielles Wachstum\n(Modell vom %s)' % today.strftime('%d.%m.%Y'),
                                   alpha=0.6, ax=ax)
 
@@ -194,7 +200,7 @@ plt.savefig('./%s-Germany-Covid19-Prediction.png' % today.strftime('%Y-%m-%d'), 
 
 # ## Export as Excel
 
-# In[26]:
+# In[24]:
 
 
 ger_future.to_excel('./%s-Germany-Covid19-Prediction.xlsx' % today.strftime('%Y-%m-%d'))
@@ -204,47 +210,62 @@ ger_future.to_excel('./%s-Germany-Covid19-Prediction.xlsx' % today.strftime('%Y-
 # 
 # We are using Bokeh to export an interactive website
 
-# In[27]:
+# In[25]:
 
 
 from bokeh.plotting import figure
 from bokeh.models.formatters import DatetimeTickFormatter
-from bokeh.models import BoxAnnotation
-from bokeh.models import Div
+from bokeh.models import Div, HoverTool, BoxAnnotation
 from bokeh.layouts import column
 from bokeh.io import output_file, save
 
 
-# In[28]:
+# In[26]:
 
 
-p = figure(plot_width=1280, plot_height=720,
+p = figure(tools="hover,save,pan,box_zoom,reset,wheel_zoom",
            x_axis_type="datetime", y_axis_type="log",
            title=title)
 
-p.line(ger_future.index, ger_future.predicted, line_width=5,
+# Vorhersagemodell als Linie
+p.line(ger_future.index, ger_future.predicted, line_width=5, line_color='darkred',
        legend='exponentielles Wachstum\n(Modell vom %s)' % today.strftime('%d.%m.%Y'))
 
+# Tatsächliche Fälle als Punkte
 p.circle(ger_confirmed.index, ger_confirmed.confirmed,
-         fill_color="white", size=12, legend='Bestätigte Fälle')
+         fill_color="lightblue", size=12, legend='Bestätigte COVID-19 Fälle')
 
+# X-Achse ordentlich formatieren
 p.xaxis.formatter=DatetimeTickFormatter(
     years="%d.%m.%Y",
     months="%d.%m.%Y",
     days="%A %d.%m.%Y",
 )
 
+# Legende
+p.legend.location = "top_left"
+
+# Daten-Zeitraum
 gray_box = BoxAnnotation(left=ger_confirmed.index[0],
                           right=ger_confirmed.index[-1],
                           fill_color='gray', fill_alpha=0.1)
 p.add_layout(gray_box)
 
-p.legend.location = "top_left"
+# Tooltips
+p.select_one(HoverTool).tooltips = [
+    ('Datum', '@x{%d.%m.%Y}'),
+    ('Fälle', '@y{0.0a}'),
+]
+p.select_one(HoverTool).formatters = {'x':'datetime'}
+p.select_one(HoverTool).mode = 'vline'
 
-div = Div(text="""Quellcode: <a href="https://github.com/balzer82/covid-germany-predictor">Covid Germany Predictor</a> unter CC-BY2.0 Lizenz on Github.""",
-width=600, height=100)
+# Anmerkung
+div = Div(text="""Quellcode: <a href="https://github.com/balzer82/covid-germany-predictor">Covid Germany Predictor</a> unter CC-BY2.0 Lizenz on Github.""")
 
-output_file("index.html")
-save(column(p, div))
+# Save
+output_file("index.html", title='Covid19 Prediction Germany')
+
+save(column(p, div, sizing_mode="stretch_both"))
+
 
 # CC-BY 2.0 Paul Balzer
