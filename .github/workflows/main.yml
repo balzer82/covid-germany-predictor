@@ -13,4 +13,4 @@ jobs:
         user: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         localDir: ""
-        remoteDir: "/html/cbcity.de/covid"
+        remoteDir: "/cbcity.de/covid"
