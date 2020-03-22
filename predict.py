@@ -5,6 +5,7 @@
 
 
 import pandas as pd
+pd.set_option('display.max_rows', 500)
 import time
 import datetime
 
@@ -156,7 +157,7 @@ logy_pred = clf.predict(X)
 # In[17]:
 
 
-confirmed.loc[:today,'predicted'] = np.exp(logy_pred).astype('int')
+confirmed.loc[:today,'predicted_exp'] = np.exp(logy_pred).astype('int')
 
 
 # In[18]:
@@ -175,19 +176,50 @@ A = np.exp(clf.intercept_)
 print('Modellparameter sind A=%.1f, B=%.3f' % (A, B))
 
 
-# ### Model Evaluation
+# ### Logistisches Wachstum
 # 
-# R² score: the coefficient of determination
+# Anmerkung: Typischerweise ist nur der Beginn einer Epedemie mit exponentiellem Wachstum, denn irgendwann sind die Menschen immun oder verstorben und das Virus kann sich nicht weiter ausbreiten. Daher geht die Infektion in eine Sättigung. Die exponentielle Wachstumsfunktion geht in eine Logistische Funktion über:
+# 
+# $P(t) = \cfrac{K}{1+\left(\frac{K-P_0}{P_0}\right)e^{-rt}}$
+# 
+# mit:
+# * $P$ = Population, hier Infizierte
+# * $t$ = Tage
+# * $r$ = Wachstumsrate
+# * $K$ = Kapazität (Sättigung, da gehen wir von 70% der 81mio deutschen aus)
+# * $P_0$ = initial Infizierte am Tag 0
+# 
+# Hier können wir die gefundenen Modellparameter aus dem exponentiellen Wachstum nutzen.
 
 # In[20]:
 
 
-r2_score(confirmed['confirmed'].values, confirmed['predicted'].values)
+infektionsrate = 0.7
+gesamtanzahl = 81000000
+
+
+# In[21]:
+
+
+def logistic_function(s, r=B, K=infektionsrate*gesamtanzahl, P0=A):
+    t=s.days
+    P = K / (1 + ((K-P0)/P0) * np.exp(-r*t))
+    return int(P)
+
+
+# ### Model Evaluation
+# 
+# R² score: the coefficient of determination
+
+# In[22]:
+
+
+r2_score(confirmed['confirmed'].values, confirmed['predicted_exp'].values)
 
 
 # ## Save the model for later use
 
-# In[21]:
+# In[23]:
 
 
 import pickle
@@ -201,13 +233,13 @@ print('Saved the Model to %s' % pklfilename)
 
 # ## Future
 
-# In[22]:
+# In[24]:
 
 
-fd = 12 # days into the future
+fd = 13 # days into the future
 
 
-# In[23]:
+# In[25]:
 
 
 # Create DataFrame in the Future
@@ -217,55 +249,61 @@ days_in_future = confirmed.days[-1] + np.arange(1, fd)
 future = pd.DataFrame(data=days_in_future, index=dates, columns=['days'])
 
 
-# In[24]:
+# In[26]:
 
 
-ger_future = confirmed.append(future, sort=True)
+future = confirmed.append(future, sort=True)
 
 
 # ### Predict the Future
 
-# In[25]:
-
-
-X_future = ger_future['days'].values.reshape(-1, 1)
-
-
-# In[26]:
-
-
-logy_pred = clf.predict(X_future)
-ger_future['predicted'] = np.exp(logy_pred).astype('int')
-
-
 # In[27]:
 
 
-ger_future
+X_future = future['days'].values.reshape(-1, 1)
 
-
-# ## Future Plot
 
 # In[28]:
 
 
-title = 'Bestätigte Fälle und Vorhersage für Deutschland (Basierend auf CSSE COVID-19 Dataset)'
+logy_pred = clf.predict(X_future)
+future['predicted_exp'] = np.exp(logy_pred).astype('int')
 
 
 # In[29]:
 
 
-ax = ger_future['confirmed'].plot(label='Bestätigte COVID-19 Fälle', marker='o')
-ax = ger_future['predicted'].plot(label='exponentielles Wachstum\n(Modell vom %s)' % today.strftime('%d.%m.%Y'),
+future['predicted_log'] = future.apply(logistic_function, axis=1)
+
+
+# In[30]:
+
+
+print(future)
+
+
+# ## Future Plot
+
+# In[31]:
+
+
+title = 'Bestätigte Fälle und Vorhersage für Deutschland (Basierend auf CSSE COVID-19 Dataset)'
+
+
+# In[32]:
+
+
+ax = future['confirmed'].plot(label='Bestätigte COVID-19 Fälle', marker='o')
+ax = future['predicted_log'].plot(label='logistisches Wachstum\n(Modell vom %s)' % today.strftime('%d.%m.%Y'),
                                   alpha=0.6, ax=ax)
 
 ax.vlines(ausgangssperren_timestamp,
-          ymin=ger_future.predicted.min(),
-          ymax=ger_future.predicted.max(),
+          ymin=future.predicted_exp.min(),
+          ymax=future.predicted_exp.max(),
           linestyle='--', alpha=0.2, label='Beginn Ausgangssperren')
 
 ax.legend()
-ax.set_ylabel('Log(Anzahl)')
+ax.set_ylabel('Anzahl (Logarithmisch)')
 ax.set_yscale('log')
 ax.set_title(title, fontsize=8)
 ax.annotate('unter CC-BY 2.0 Lizenz Paul Balzer', xy=(.5, 0.02), xycoords='figure fraction', ha='center', fontsize=6, color='gray')
@@ -277,11 +315,11 @@ print('Saved the Figure')
 
 # ## Export as Excel
 
-# In[30]:
+# In[33]:
 
 
 xlsfile = './%s-Germany-Covid19-Prediction.xlsx' % today.strftime('%Y-%m-%d')
-ger_future.to_excel(xlsfile)
+future.to_excel(xlsfile)
 print('Saved the Excel to %s' % xlsfile)
 
 
@@ -289,11 +327,11 @@ print('Saved the Excel to %s' % xlsfile)
 # 
 # We are using Bokeh to export an interactive website
 
-# In[31]:
+# In[34]:
 
 
 from bokeh.plotting import figure
-from bokeh.models.formatters import DatetimeTickFormatter
+from bokeh.models.formatters import DatetimeTickFormatter, NumeralTickFormatter
 from bokeh.models import Div, HoverTool, BoxAnnotation, Span
 from bokeh.layouts import column
 from bokeh.embed import file_html
@@ -301,17 +339,17 @@ from bokeh.resources import CDN
 from bokeh.palettes import inferno
 
 
-# In[32]:
+# In[35]:
 
 
 colors = inferno(6) # What else for this scenario ;)
 
 
-# In[38]:
+# In[36]:
 
 
 p = figure(tools="hover,save,pan,box_zoom,reset,wheel_zoom",
-           x_axis_type="datetime", y_axis_type="log",
+           x_axis_type="datetime",
            title=title.replace(')', ' der John Hopkins University)'))
 
 # Vertical line for Ausgangssperren
@@ -321,21 +359,22 @@ vline = Span(location=ausgangssperren_timestamp_epoch,
 p.add_layout(vline)
 
 # Vorhersagemodell als Linie
-p.line(ger_future.index, ger_future.predicted, line_width=4, line_color=colors[3],
-       legend='exponentielles Wachstum\n(Modell vom %s)' % today.strftime('%d.%m.%Y'))
+p.line(future.index, future.predicted_log, line_width=4, line_color=colors[3],
+       legend='logistisches Wachstum\n(Modell vom %s)' % today.strftime('%d.%m.%Y'))
 
 # Tatsächliche Fälle als Punkte
 p.circle(confirmed.index, confirmed.confirmed, line_color=colors[4],
          fill_color=colors[5], size=14, legend='Bestätigte COVID-19 Fälle')
 
-# X-Achse ordentlich formatieren
+# Achsen ordentlich formatieren
 p.xaxis.formatter=DatetimeTickFormatter(
     years="%d.%m.%Y",
     months="%d.%m.%Y",
     days="%A %d.%m.%Y",
 )
+p.yaxis.formatter=NumeralTickFormatter(format='0.0a')
 
-p.yaxis.axis_label = 'Anzahl (Logarithmisch)'
+p.yaxis.axis_label = 'Anzahl'
 
 # Daten-Zeitraum
 gray_box = BoxAnnotation(left=confirmed.index[0],
@@ -360,7 +399,10 @@ p.legend.location = "top_left"
 div = Div(text="""Quellcode: <a href="https://github.com/balzer82/covid-germany-predictor">Covid Germany Predictor</a>
             unter CC-BY2.0 Lizenz von Paul Balzer on Github.
             Disclaimer: Ich bin kein Epidemiologe oder Virologe, das ist keine offizielle Vorausberechnung! 
-            <a href="https://cbcity.de/impressum">Impressum</a>""")
+            Es wurde ein exponentielles Wachstumsmodell mittels Least Square auf die gemeldeten Fälle gefittet,
+            anschließend wurden diese Parameter auf eine logistische Funktion angewendet, welche mit %i%% Infektionsrate
+            unter %imio Deutschen in die Sättigung geht.
+            <a href="https://cbcity.de/impressum">Impressum</a>""" % (infektionsrate*100, gesamtanzahl/1e6))
 
 # Save
 html = file_html(column(p, div, sizing_mode="stretch_both"), CDN, 'COVID-19 Prediction Germany')
@@ -368,7 +410,7 @@ html = file_html(column(p, div, sizing_mode="stretch_both"), CDN, 'COVID-19 Pred
 
 # ## Style the Website
 
-# In[39]:
+# In[37]:
 
 
 head = '''
@@ -377,7 +419,7 @@ head = '''
 '''
 
 
-# In[40]:
+# In[38]:
 
 
 gtc = '''
@@ -394,14 +436,14 @@ gtc = '''
 '''
 
 
-# In[41]:
+# In[39]:
 
 
 websitehtml = html.replace('<body>', head)
 websitehtml = websitehtml.replace('</body>', gtc)
 
 
-# In[42]:
+# In[40]:
 
 
 with open('./html/index.html', 'w') as htmlfile:
