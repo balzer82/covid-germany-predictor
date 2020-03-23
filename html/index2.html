@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+  <head>
+    
+      <meta charset="utf-8">
+      <title>COVID-19 Prediction Germany</title>
+      
+      
+        
+          
+        <link rel="stylesheet" href="https://cdn.pydata.org/bokeh/release/bokeh-1.0.4.min.css" type="text/css" />
+        <link rel="stylesheet" href="https://cdn.pydata.org/bokeh/release/bokeh-widgets-1.0.4.min.css" type="text/css" />
+        
+        
+          
+        <script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-1.0.4.min.js"></script>
+        <script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-widgets-1.0.4.min.js"></script>
+        <script type="text/javascript">
+            Bokeh.set_log_level("info");
+        </script>
+        
+      
+      
+    
+  </head>
+  
+  
+  
+  <body>
+        <div><img src="https://wirvsvirushackathon.org/wp-content/uploads/2020/03/12-scaled.jpg" style="height: 30px; padding: 10px;"></div>
+
+    
+      
+        
+          
+          
+            
+              <div class="bk-root" id="4daa90aa-6a57-4341-b3a1-bf1e4f14f05b" data-root-id="2429"></div>
+            
+          
+        
+      
+      
+        <script type="application/json" id="2590">
+          {"2c7664d1-d673-45c3-b0cb-9e0fcfc10bdc":{"roots":{"references":[{"attributes":{"overlay":{"id":"2303","type":"BoxAnnotation"}},"id":"2297","type":"BoxZoomTool"},{"attributes":{"active_drag":"auto","active_inspect":"auto","active_multi":null,"active_scroll":"auto","active_tap":"auto","autohide":true,"tools":[{"id":"2294","type":"HoverTool"},{"id":"2295","type":"SaveTool"},{"id":"2296","type":"PanTool"},{"id":"2297","type":"BoxZoomTool"},{"id":"2298","type":"ResetTool"},{"id":"2299","type":"WheelZoomTool"}]},"id":"2300","type":"Toolbar"},{"attributes":{},"id":"2295","type":"SaveTool"},{"attributes":{"source":{"id":"2335","type":"ColumnDataSource"}},"id":"2339","type":"CDSView"},{"attributes":{"callback":null,"formatters":{"x":"datetime"},"mode":"vline","tooltips":[["Datum","@x{%d.%m.%Y}"],["F\u00e4lle","@y{0.0a}"]]},"id":"2294","type":"HoverTool"},{"attributes":{},"id":"2296","type":"PanTool"},{"attributes":{"mantissas":[1,2,5],"max_interval":500.0,"num_minor_ticks":0},"id":"2320","type":"AdaptiveTicker"},{"attributes":{"days":[1,8,15,22]},"id":"2325","type":"DaysTicker"},{"attributes":{"label":{"value":"Best\u00e4tigte COVID-19 Todesf\u00e4lle"},"renderers":[{"id":"2338","type":"GlyphRenderer"}]},"id":"2360","type":"LegendItem"},{"attributes":{"base":24,"mantissas":[1,2,4,6,8,12],"max_interval":43200000.0,"min_interval":3600000.0,"num_minor_ticks":0},"id":"2322","type":"AdaptiveTicker"},{"attributes":{"months":[0,6]},"id":"2330","type":"MonthsTicker"},{"attributes":{"axis_label":"Anzahl","formatter":{"id":"2363","type":"NumeralTickFormatter"},"plot":{"id":"2274","subtype":"Figure","type":"Plot"},"ticker":{"id":"2290","type":"BasicTicker"}},"id":"2289","type":"LinearAxis"},{"attributes":{"days":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]},"id":"2323","type":"DaysTicker"},{"attributes":{},"id":"2290","type":"BasicTicker"},{"attributes":{"days":[1,4,7,10,13,16,19,22,25,28]},"id":"2324","type":"DaysTicker"},{"attributes":{"callback":null,"data":{"x":{"__ndarray__":"AAAA2LcNd0IAAMA9Cg53QgAAgKNcDndCAABACa8Od0IAAABvAQ93QgAAwNRTD3dCAACAOqYPd0I=","dtype":"float64","shape":[7]},"y":[11,17,24,28,44,67,84]},"selected":{"id":"2384","type":"Selection"},"selection_policy":{"id":"2383","type":"UnionRenderers"}},"id":"2335","type":"ColumnDataSource"},{"attributes":{"format":"0.0a"},"id":"2363","type":"NumeralTickFormatter"},{"attributes":{},"id":"2357","type":"UnionRenderers"},{"attributes":{"days":[1,15]},"id":"2326","type":"DaysTicker"},{"attributes":{"data_source":{"id":"2310","type":"ColumnDataSource"},"glyph":{"id":"2311","type":"Line"},"hover_glyph":null,"muted_glyph":null,"nonselection_glyph":{"id":"2312","type":"Line"},"selection_glyph":null,"view":{"id":"2314","type":"CDSView"}},"id":"2313","type":"GlyphRenderer"},{"attributes":{"sizing_mode":"stretch_both","text":"Quellcode: &lt;a href=\"https://github.com/balzer82/covid-germany-predictor\"&gt;Covid Germany Predictor&lt;/a&gt;\n            unter CC-BY2.0 Lizenz von Paul Balzer on Github.\n            Disclaimer: Ich bin kein Epidemiologe oder Virologe, das ist keine offizielle Vorausberechnung! \n            Es wurde ein exponentielles Wachstumsmodell mittels Least Square auf die gemeldeten F\u00e4lle gefittet,\n            anschlie\u00dfend wurden diese Parameter auf eine logistische Funktion angewendet, welche mit 70% Infektionsrate\n            unter 81mio Deutschen in die S\u00e4ttigung geht und dabei 5% Sterblichkeit auftritt.\n            &lt;a href=\"https://cbcity.de/impressum\"&gt;Impressum&lt;/a&gt;"},"id":"2427","type":"Div"},{"attributes":{"source":{"id":"2310","type":"ColumnDataSource"}},"id":"2314","type":"CDSView"},{"attributes":{"days":["%A %d.%m.%Y"],"months":["%d.%m.%Y"],"years":["%d.%m.%Y"]},"id":"2361","type":"DatetimeTickFormatter"},{"attributes":{},"id":"2383","type":"UnionRenderers"},{"attributes":{"fill_alpha":{"value":0.1},"fill_color":{"value":"gray"},"left":1584230400000.0,"plot":{"id":"2274","subtype":"Figure","type":"Plot"},"right":1584748800000.0},"id":"2365","type":"BoxAnnotation"},{"attributes":{"months":[0,2,4,6,8,10]},"id":"2328","type":"MonthsTicker"},{"attributes":{"below":[{"id":"2284","type":"DatetimeAxis"}],"left":[{"id":"2289","type":"LinearAxis"}],"renderers":[{"id":"2284","type":"DatetimeAxis"},{"id":"2288","type":"Grid"},{"id":"2289","type":"LinearAxis"},{"id":"2293","type":"Grid"},{"id":"2303","type":"BoxAnnotation"},{"id":"2309","type":"Span"},{"id":"2333","type":"Legend"},{"id":"2313","type":"GlyphRenderer"},{"id":"2338","type":"GlyphRenderer"},{"id":"2365","type":"BoxAnnotation"}],"sizing_mode":"stretch_both","title":{"id":"2273","type":"Title"},"toolbar":{"id":"2300","type":"Toolbar"},"x_range":{"id":"2276","type":"DataRange1d"},"x_scale":{"id":"2280","type":"LinearScale"},"y_range":{"id":"2278","type":"DataRange1d"},"y_scale":{"id":"2282","type":"LinearScale"}},"id":"2274","subtype":"Figure","type":"Plot"},{"attributes":{"months":[0,4,8]},"id":"2329","type":"MonthsTicker"},{"attributes":{"children":[{"id":"2274","subtype":"Figure","type":"Plot"},{"id":"2428","type":"WidgetBox"}],"sizing_mode":"stretch_both"},"id":"2429","type":"Column"},{"attributes":{"children":[{"id":"2427","type":"Div"}],"sizing_mode":"stretch_both"},"id":"2428","type":"WidgetBox"},{"attributes":{},"id":"2384","type":"Selection"},{"attributes":{"dimension":"height","line_color":{"value":"gray"},"line_dash":[6],"line_width":{"value":3},"location":1584745200000.0,"name":"Beginn Ausgangssperren","plot":{"id":"2274","subtype":"Figure","type":"Plot"}},"id":"2309","type":"Span"},{"attributes":{"items":[{"id":"2334","type":"LegendItem"},{"id":"2360","type":"LegendItem"}],"location":"top_left","plot":{"id":"2274","subtype":"Figure","type":"Plot"}},"id":"2333","type":"Legend"},{"attributes":{"label":{"value":"logistisches Wachstum\n(Modell vom 21.03.2020)"},"renderers":[{"id":"2313","type":"GlyphRenderer"}]},"id":"2334","type":"LegendItem"},{"attributes":{"base":60,"mantissas":[1,2,5,10,15,20,30],"max_interval":1800000.0,"min_interval":1000.0,"num_minor_ticks":0},"id":"2321","type":"AdaptiveTicker"},{"attributes":{"plot":null,"text":"Todesf\u00e4lle und Vorhersage f\u00fcr Deutschland (Basierend auf CSSE COVID-19 Dataset der John Hopkins University)"},"id":"2273","type":"Title"},{"attributes":{},"id":"2331","type":"YearsTicker"},{"attributes":{"plot":{"id":"2274","subtype":"Figure","type":"Plot"},"ticker":{"id":"2285","type":"DatetimeTicker"}},"id":"2288","type":"Grid"},{"attributes":{"callback":null},"id":"2278","type":"DataRange1d"},{"attributes":{"fill_color":{"value":"#FCFEA4"},"line_color":{"value":"#FBA40A"},"size":{"units":"screen","value":14},"x":{"field":"x"},"y":{"field":"y"}},"id":"2336","type":"Circle"},{"attributes":{"callback":null,"data":{"x":{"__ndarray__":"AAAA2LcNd0IAAMA9Cg53QgAAgKNcDndCAABACa8Od0IAAABvAQ93QgAAwNRTD3dCAACAOqYPd0IAAECg+A93QgAAAAZLEHdCAADAa50Qd0IAAIDR7xB3QgAAQDdCEXdCAAAAnZQRd0IAAMAC5xF3QgAAgGg5EndCAABAzosSd0IAAAA03hJ3QgAAwJkwE3dCAACA/4ITd0IAAEBl1RN3QgAAAMsnFHdCAADAMHoUd0IAAICWzBR3QgAAQPweFXdCAAAAYnEVd0IAAMDHwxV3QgAAgC0WFndCAABAk2gWd0IAAAD5uhZ3QgAAwF4NF3dCAACAxF8Xd0IAAEAqshd3QgAAAJAEGHdCAADA9VYYd0IAAIBbqRh3QgAAQMH7GHdC","dtype":"float64","shape":[36]},"y":[11,16,22,31,44,61,86,121,170,238,334,469,657,921,1290,1808,2533,3548,4970,6959,9743,13634,19070,26651,37207,51866,72153,100088,138297,190079,259384,350609,468087,615182,793013,999113]},"selected":{"id":"2358","type":"Selection"},"selection_policy":{"id":"2357","type":"UnionRenderers"}},"id":"2310","type":"ColumnDataSource"},{"attributes":{"callback":null},"id":"2276","type":"DataRange1d"},{"attributes":{"line_alpha":0.1,"line_color":"#1f77b4","line_width":4,"x":{"field":"x"},"y":{"field":"y"}},"id":"2312","type":"Line"},{"attributes":{},"id":"2299","type":"WheelZoomTool"},{"attributes":{"data_source":{"id":"2335","type":"ColumnDataSource"},"glyph":{"id":"2336","type":"Circle"},"hover_glyph":null,"muted_glyph":null,"nonselection_glyph":{"id":"2337","type":"Circle"},"selection_glyph":null,"view":{"id":"2339","type":"CDSView"}},"id":"2338","type":"GlyphRenderer"},{"attributes":{},"id":"2280","type":"LinearScale"},{"attributes":{},"id":"2358","type":"Selection"},{"attributes":{"bottom_units":"screen","fill_alpha":{"value":0.5},"fill_color":{"value":"lightgrey"},"left_units":"screen","level":"overlay","line_alpha":{"value":1.0},"line_color":{"value":"black"},"line_dash":[4,4],"line_width":{"value":2},"plot":null,"render_mode":"css","right_units":"screen","top_units":"screen"},"id":"2303","type":"BoxAnnotation"},{"attributes":{},"id":"2282","type":"LinearScale"},{"attributes":{"line_color":"#DC5039","line_width":4,"x":{"field":"x"},"y":{"field":"y"}},"id":"2311","type":"Line"},{"attributes":{"dimension":1,"plot":{"id":"2274","subtype":"Figure","type":"Plot"},"ticker":{"id":"2290","type":"BasicTicker"}},"id":"2293","type":"Grid"},{"attributes":{"num_minor_ticks":5,"tickers":[{"id":"2320","type":"AdaptiveTicker"},{"id":"2321","type":"AdaptiveTicker"},{"id":"2322","type":"AdaptiveTicker"},{"id":"2323","type":"DaysTicker"},{"id":"2324","type":"DaysTicker"},{"id":"2325","type":"DaysTicker"},{"id":"2326","type":"DaysTicker"},{"id":"2327","type":"MonthsTicker"},{"id":"2328","type":"MonthsTicker"},{"id":"2329","type":"MonthsTicker"},{"id":"2330","type":"MonthsTicker"},{"id":"2331","type":"YearsTicker"}]},"id":"2285","type":"DatetimeTicker"},{"attributes":{},"id":"2298","type":"ResetTool"},{"attributes":{"formatter":{"id":"2361","type":"DatetimeTickFormatter"},"plot":{"id":"2274","subtype":"Figure","type":"Plot"},"ticker":{"id":"2285","type":"DatetimeTicker"}},"id":"2284","type":"DatetimeAxis"},{"attributes":{"months":[0,1,2,3,4,5,6,7,8,9,10,11]},"id":"2327","type":"MonthsTicker"},{"attributes":{"fill_alpha":{"value":0.1},"fill_color":{"value":"#1f77b4"},"line_alpha":{"value":0.1},"line_color":{"value":"#1f77b4"},"size":{"units":"screen","value":14},"x":{"field":"x"},"y":{"field":"y"}},"id":"2337","type":"Circle"}],"root_ids":["2429"]},"title":"Bokeh Application","version":"1.0.4"}}
+        </script>
+        <script type="text/javascript">
+          (function() {
+            var fn = function() {
+              Bokeh.safely(function() {
+                (function(root) {
+                  function embed_document(root) {
+                    
+                  var docs_json = document.getElementById('2590').textContent;
+                  var render_items = [{"docid":"2c7664d1-d673-45c3-b0cb-9e0fcfc10bdc","roots":{"2429":"4daa90aa-6a57-4341-b3a1-bf1e4f14f05b"}}];
+                  root.Bokeh.embed.embed_items(docs_json, render_items);
+                
+                  }
+                  if (root.Bokeh !== undefined) {
+                    embed_document(root);
+                  } else {
+                    var attempts = 0;
+                    var timer = setInterval(function(root) {
+                      if (root.Bokeh !== undefined) {
+                        embed_document(root);
+                        clearInterval(timer);
+                      }
+                      attempts++;
+                      if (attempts > 100) {
+                        console.log("Bokeh: ERROR: Unable to run BokehJS code because BokehJS library is missing");
+                        clearInterval(timer);
+                      }
+                    }, 10, root)
+                  }
+                })(window);
+              });
+            };
+            if (document.readyState != "loading") fn();
+            else document.addEventListener("DOMContentLoaded", fn);
+          })();
+        </script>
+    
+  
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-7230698-7"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'UA-7230698-7');
+        </script>
+    </body>
+
+  
+</html>
