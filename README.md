@@ -10,6 +10,13 @@ Siehe NRD Podcast mit Prof. Drosten [#18 - Die Wirksamkeit von Ausgangssperren i
 
 Die Daten werden aus dem [2019 Novel Coronavirus COVID-19 (2019-nCoV) Data Repository by Johns Hopkins CSSE](https://github.com/CSSEGISandData/COVID-19) geladen. Mit den Ansteckungszahlen wird ein exponentielles Modell trainiert, welches die Daten optimal abbildet. Damit werden Vorhersagen zur Verbreitung in den nächsten Tagen getroffen.
 
+## Disclaimer
+
+Es ist zu beachten, dass ich kein Epidemiologe oder Virologe bin. Jedes Modell ist nur eine Annahme. Es muss natürlich nicht so kommen. Umso weiter man in die Zukunft extrapoliert, umso unwahrscheinlicher wird die Vorhersage.
+
+**Dies ist keine offizielle Vorausberechnung!**
+
+
 ## Usage
 
 Um eine neue Vorhersage zu generieren, einfach
@@ -18,7 +25,7 @@ Um eine neue Vorhersage zu generieren, einfach
 
 ausführen und eine neue Abbildung wird erstellt, sowohl als `.png` als auch als [/html/index.html](/html/index.html). Eine Excel Tabelle mit täglicher Vorhersage sowie das angelernte Modell wird nach Datum sortiert ebenfalls generiert.
 
-Eine interaktive Abbildung ist unter https://cbcity.de/covid/ zu finden
+Eine interaktive Abbildung ist unter https://cbcity.de/covid/ zu finden.
 
 ### Serve the (static) Figure
 
