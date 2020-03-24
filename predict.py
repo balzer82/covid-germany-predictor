@@ -225,7 +225,7 @@ print('R2 = %.3f' % r)
 
 import pickle
 
-pklfilename = '%s-Germany-Covid19-Prediction-Model.pkl' % today.strftime('%Y-%m-%d')
+pklfilename = '%s-Germany-Covid19-Prediction-Model.pkl' % confirmed.index[-1].strftime('%Y-%m-%d')
 with open(pklfilename, 'wb') as f:
     pickle.dump(clf, f)
     
@@ -312,7 +312,7 @@ ax.set_title(title, fontsize=8)
 ax.annotate('unter CC-BY 2.0 Lizenz Paul Balzer', xy=(.5, 0.02), xycoords='figure fraction', ha='center', fontsize=6, color='gray')
 
 plt.tight_layout()
-plt.savefig('./%s-Germany-Covid19-Prediction.png' % today.strftime('%Y-%m-%d'), dpi=150)
+plt.savefig('./%s-Germany-Covid19-Prediction.png' % confirmed.index[-1].strftime('%Y-%m-%d'), dpi=150)
 print('Saved the Figure')
 
 
@@ -321,7 +321,7 @@ print('Saved the Figure')
 # In[33]:
 
 
-xlsfile = './%s-Germany-Covid19-Prediction.xlsx' % today.strftime('%Y-%m-%d')
+xlsfile = './%s-Germany-Covid19-Prediction.xlsx' % confirmed.index[-1].strftime('%Y-%m-%d')
 future.to_excel(xlsfile)
 print('Saved the Excel to %s' % xlsfile)
 
