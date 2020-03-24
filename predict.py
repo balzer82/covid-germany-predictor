@@ -1,7 +1,7 @@
 #!/usr/bin/env python#!/usr/bin/python
 # coding: utf-8
 
-# In[1]:
+# In[82]:
 
 
 import pandas as pd
@@ -23,7 +23,7 @@ plt.style.use('bmh')
 # 
 # We are using the Covid-19 Dataset: https://github.com/CSSEGISandData/COVID-19
 
-# In[2]:
+# In[83]:
 
 
 url = 'https://raw.githubusercontent.com'
@@ -33,13 +33,13 @@ url += '/time_series_19-covid-Confirmed.csv'
 print('Downloading Data from %s' % url)
 
 
-# In[3]:
+# In[84]:
 
 
 confirmed_raw = pd.read_csv(url)
 
 
-# In[4]:
+# In[85]:
 
 
 confirmed_raw.head()
@@ -47,7 +47,7 @@ confirmed_raw.head()
 
 # ### Preprocessing
 
-# In[5]:
+# In[86]:
 
 
 confirmed = confirmed_raw[confirmed_raw['Country/Region']=='Germany'].T
@@ -55,7 +55,7 @@ confirmed = confirmed[4:].astype('int')
 confirmed.columns = ['confirmed']
 
 
-# In[6]:
+# In[87]:
 
 
 confirmed.index = pd.to_datetime(confirmed.index)
@@ -64,7 +64,7 @@ confirmed = confirmed.asfreq('D')
 
 # Filter der Daten: Wir nehmen für die Modellbildung erst den Tag als Beginn, an dem erstmals mehr als 100 Erkrankte gemeldet waren.
 
-# In[7]:
+# In[88]:
 
 
 confirmed = confirmed[confirmed.confirmed>=100]
@@ -74,7 +74,7 @@ confirmed = confirmed[confirmed.confirmed>=100]
 # 
 # Man kann immer ein aktuelles Modell rechnen, oder schauen wie sich die Zahlen verändern, basierend auf einem Modell von einem festen Datum aus.
 
-# In[8]:
+# In[89]:
 
 
 #today = confirmed.index[-1] # immer aktuell rechnen
@@ -83,13 +83,13 @@ today = datetime.date(2020, 3, 21) # 21.03.2020 als Bezugsdatum nehme
 
 # ## Feature
 
-# In[9]:
+# In[90]:
 
 
 confirmed['days'] = (confirmed.index - confirmed.index.min()).days
 
 
-# In[10]:
+# In[91]:
 
 
 confirmed.head()
@@ -99,13 +99,13 @@ confirmed.head()
 # 
 # Am Wochenende 20.03./21.03.2020 haben einige Gemeinden und Städte Ausgangssperren verhängt (z.B. [Dresden](https://www.dresden.de/media/pdf/presseamt/Allgemeinverfuegung.pdf), Mitterteich, ganz Bayern usw). Daher werden wir uns das Datum mal merken.
 
-# In[11]:
+# In[92]:
 
 
 ausgangssperren_timestamp = datetime.datetime(2020, 3, 21, 12, 0)
 
 
-# In[12]:
+# In[93]:
 
 
 ausgangssperren_timestamp_epoch = time.mktime(ausgangssperren_timestamp.timetuple())*1000
@@ -121,7 +121,7 @@ ausgangssperren_timestamp_epoch = time.mktime(ausgangssperren_timestamp.timetupl
 # 
 # $\log_e(y) = B x + \log_e (A)$
 
-# In[13]:
+# In[94]:
 
 
 from sklearn.linear_model import LinearRegression
@@ -129,7 +129,7 @@ from sklearn.metrics import r2_score
 import numpy as np
 
 
-# In[14]:
+# In[95]:
 
 
 X = confirmed[:today]['days'].values.reshape(-1, 1)
@@ -139,14 +139,14 @@ logy = np.log(y)
 
 # ### Train
 
-# In[15]:
+# In[96]:
 
 
 clf = LinearRegression()
 clf.fit(X, logy)
 
 
-# In[16]:
+# In[97]:
 
 
 logy_pred = clf.predict(X)
@@ -154,13 +154,13 @@ logy_pred = clf.predict(X)
 
 # Die mit dem linearen Modell vorhergesagten Werte sind im logarithmischen, müssen mit der $e^y$ noch zurück konvertiert werden.
 
-# In[17]:
+# In[98]:
 
 
 confirmed.loc[:today,'predicted_exp'] = np.exp(logy_pred).astype('int')
 
 
-# In[18]:
+# In[99]:
 
 
 confirmed.tail()
@@ -168,7 +168,7 @@ confirmed.tail()
 
 # ### Modelparameter
 
-# In[19]:
+# In[100]:
 
 
 B = clf.coef_[0]
@@ -191,14 +191,14 @@ print('Modellparameter sind A=%.1f, B=%.3f' % (A, B))
 # 
 # Hier können wir die gefundenen Modellparameter aus dem exponentiellen Wachstum nutzen.
 
-# In[20]:
+# In[101]:
 
 
 infektionsrate = 0.7
 gesamtanzahl = 81465126
 
 
-# In[21]:
+# In[102]:
 
 
 def logistic_function(s, r=B, K=infektionsrate*gesamtanzahl, P0=A):
@@ -211,7 +211,7 @@ def logistic_function(s, r=B, K=infektionsrate*gesamtanzahl, P0=A):
 # 
 # R² score: the coefficient of determination
 
-# In[22]:
+# In[103]:
 
 
 r = r2_score(confirmed.loc[:today, 'confirmed'].values, confirmed.loc[:today,'predicted_exp'].values)
@@ -220,7 +220,7 @@ print('R2 = %.3f' % r)
 
 # ## Save the model for later use
 
-# In[23]:
+# In[104]:
 
 
 import pickle
@@ -235,14 +235,18 @@ print('Saved the Model to %s' % pklfilename)
 # ## Future
 # 
 # Basierend auf den Daten möchte man nun gern in die Zukunft blicken. Dabei kann man den nächsten Tag sicherlich relativ gut vorher sagen, aber mit zunehmender Zeit wird es unsicher (Extrapolation).
+# 
+# Wir möchten die Vorhersage immer nur bis 31.03.2020 betreiben.
 
-# In[24]:
+# In[105]:
 
 
-fd = 12 # days into the future
+#fd = 12 # days into the future
+bezugstag = datetime.date(2020, 3, 31) # bis auf dieses Datum beziehen
+fd = (bezugstag - today).days
 
 
-# In[25]:
+# In[106]:
 
 
 # Create DataFrame in the Future
@@ -252,7 +256,7 @@ days_in_future = confirmed.days[-1] + np.arange(1, fd)
 future = pd.DataFrame(data=days_in_future, index=dates, columns=['days'])
 
 
-# In[26]:
+# In[107]:
 
 
 future = confirmed.append(future, sort=True)
@@ -260,26 +264,26 @@ future = confirmed.append(future, sort=True)
 
 # ### Predict the Future
 
-# In[27]:
+# In[108]:
 
 
 X_future = future['days'].values.reshape(-1, 1)
 
 
-# In[28]:
+# In[109]:
 
 
 logy_pred = clf.predict(X_future)
 future['predicted_exp'] = np.exp(logy_pred).astype('int')
 
 
-# In[29]:
+# In[110]:
 
 
 future['predicted_log'] = future.apply(logistic_function, axis=1)
 
 
-# In[30]:
+# In[111]:
 
 
 future
@@ -287,13 +291,13 @@ future
 
 # ## Future Plot
 
-# In[31]:
+# In[112]:
 
 
 title = 'Bestätigte Fälle und Vorhersage für Deutschland (Basierend auf CSSE COVID-19 Dataset)'
 
 
-# In[32]:
+# In[113]:
 
 
 ax = future['confirmed'].plot(label='Bestätigte COVID-19 Fälle', marker='o')
@@ -318,7 +322,7 @@ print('Saved the Figure')
 
 # ## Export as Excel
 
-# In[33]:
+# In[114]:
 
 
 xlsfile = './%s-Germany-Covid19-Prediction.xlsx' % confirmed.index[-1].strftime('%Y-%m-%d')
@@ -330,7 +334,7 @@ print('Saved the Excel to %s' % xlsfile)
 # 
 # We are using Bokeh to export an interactive website
 
-# In[34]:
+# In[115]:
 
 
 from bokeh.plotting import figure
@@ -342,13 +346,13 @@ from bokeh.resources import CDN
 from bokeh.palettes import inferno
 
 
-# In[35]:
+# In[116]:
 
 
 colors = inferno(6) # What else for this scenario ;)
 
 
-# In[36]:
+# In[117]:
 
 
 p = figure(tools="hover,save,pan,box_zoom,reset,wheel_zoom",
@@ -416,7 +420,7 @@ html = file_html(column(p, div, sizing_mode="stretch_both"), CDN, 'COVID-19 Pred
 
 # ## Style the Website
 
-# In[37]:
+# In[118]:
 
 
 head = '''
@@ -425,7 +429,7 @@ head = '''
 '''
 
 
-# In[38]:
+# In[119]:
 
 
 gtc = '''
@@ -442,14 +446,14 @@ gtc = '''
 '''
 
 
-# In[39]:
+# In[120]:
 
 
 websitehtml = html.replace('<body>', head)
 websitehtml = websitehtml.replace('</body>', gtc)
 
 
-# In[40]:
+# In[121]:
 
 
 with open('./html/index.html', 'w') as htmlfile:
