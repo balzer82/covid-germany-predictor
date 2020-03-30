@@ -1,7 +1,7 @@
 #!/usr/bin/env python#!/usr/bin/python
 # coding: utf-8
 
-# In[137]:
+# In[1]:
 
 
 import pandas as pd
@@ -23,7 +23,7 @@ plt.style.use('bmh')
 # 
 # We are using the Covid-19 Dataset: https://github.com/CSSEGISandData/COVID-19
 
-# In[138]:
+# In[2]:
 
 
 url = 'https://raw.githubusercontent.com'
@@ -33,13 +33,13 @@ url += '/time_series_covid19_confirmed_global.csv'
 print('Downloading Data from %s' % url)
 
 
-# In[139]:
+# In[3]:
 
 
 confirmed_raw = pd.read_csv(url)
 
 
-# In[140]:
+# In[4]:
 
 
 confirmed_raw.head()
@@ -47,7 +47,7 @@ confirmed_raw.head()
 
 # ### Preprocessing
 
-# In[141]:
+# In[5]:
 
 
 confirmed = confirmed_raw[confirmed_raw['Country/Region']=='Germany'].T
@@ -55,7 +55,7 @@ confirmed = confirmed[4:].astype('int')
 confirmed.columns = ['confirmed']
 
 
-# In[142]:
+# In[6]:
 
 
 confirmed.index = pd.to_datetime(confirmed.index)
@@ -64,7 +64,7 @@ confirmed = confirmed.asfreq('D')
 
 # Filter der Daten: Wir nehmen für die Modellbildung erst den Tag als Beginn, an dem erstmals mehr als 100 Erkrankte gemeldet waren.
 
-# In[143]:
+# In[7]:
 
 
 confirmed = confirmed[confirmed.confirmed>=100]
@@ -74,7 +74,7 @@ confirmed = confirmed[confirmed.confirmed>=100]
 # 
 # Man kann immer ein aktuelles Modell rechnen, oder schauen wie sich die Zahlen verändern, basierend auf einem Modell von einem festen Datum aus.
 
-# In[144]:
+# In[8]:
 
 
 #today = confirmed.index[-1] # immer aktuell rechnen
@@ -83,13 +83,13 @@ today = datetime.date(2020, 3, 21) # 21.03.2020 als Bezugsdatum nehme
 
 # ## Feature
 
-# In[145]:
+# In[9]:
 
 
 confirmed['days'] = (confirmed.index - confirmed.index.min()).days
 
 
-# In[146]:
+# In[10]:
 
 
 confirmed.head()
@@ -99,13 +99,13 @@ confirmed.head()
 # 
 # Am Wochenende 20.03./21.03.2020 haben einige Gemeinden und Städte Ausgangssperren verhängt (z.B. [Dresden](https://www.dresden.de/media/pdf/presseamt/Allgemeinverfuegung.pdf), Mitterteich, ganz Bayern usw). Daher werden wir uns das Datum mal merken.
 
-# In[147]:
+# In[11]:
 
 
 ausgangssperren_timestamp = datetime.datetime(2020, 3, 21, 12, 0)
 
 
-# In[148]:
+# In[12]:
 
 
 ausgangssperren_timestamp_epoch = time.mktime(ausgangssperren_timestamp.timetuple())*1000
@@ -113,7 +113,9 @@ ausgangssperren_timestamp_epoch = time.mktime(ausgangssperren_timestamp.timetupl
 
 # ## Prediction Model
 # 
-# Ein exponentielles Wachstum (freie unkontrollierte Ausbreitung) verläuft nach:
+# In der Realität ist es etwas komplexer als wir hier annehmen, siehe: https://medium.com/data-for-science/epidemic-modeling-101-or-why-your-covid19-exponential-fits-are-wrong-97aa50c55f8
+# 
+# Aber für die erste Zeit nehmen wir ein exponentielles Wachstum an. Ein exponentielles Wachstum (freie unkontrollierte Ausbreitung) verläuft nach:
 # 
 # $y = A e^{Bx}$
 # 
@@ -121,7 +123,7 @@ ausgangssperren_timestamp_epoch = time.mktime(ausgangssperren_timestamp.timetupl
 # 
 # $\log_e(y) = B x + \log_e (A)$
 
-# In[149]:
+# In[13]:
 
 
 from sklearn.linear_model import LinearRegression
@@ -129,7 +131,7 @@ from sklearn.metrics import r2_score
 import numpy as np
 
 
-# In[150]:
+# In[14]:
 
 
 X = confirmed[:today]['days'].values.reshape(-1, 1)
@@ -139,14 +141,14 @@ logy = np.log(y)
 
 # ### Train
 
-# In[151]:
+# In[15]:
 
 
 clf = LinearRegression()
 clf.fit(X, logy)
 
 
-# In[152]:
+# In[16]:
 
 
 logy_pred = clf.predict(X)
@@ -154,13 +156,13 @@ logy_pred = clf.predict(X)
 
 # Die mit dem linearen Modell vorhergesagten Werte sind im logarithmischen, müssen mit der $e^y$ noch zurück konvertiert werden.
 
-# In[153]:
+# In[17]:
 
 
 confirmed.loc[:today,'predicted_exp'] = np.exp(logy_pred).astype('int')
 
 
-# In[154]:
+# In[18]:
 
 
 confirmed.tail()
@@ -168,7 +170,7 @@ confirmed.tail()
 
 # ### Modelparameter
 
-# In[155]:
+# In[19]:
 
 
 B = clf.coef_[0]
@@ -178,7 +180,9 @@ print('Modellparameter sind A=%.1f, B=%.3f' % (A, B))
 
 # ### Logistisches Wachstum
 # 
-# Anmerkung: Typischerweise ist nur der Beginn einer Epedemie mit exponentiellem Wachstum, denn irgendwann sind die Menschen immun oder verstorben und das Virus kann sich nicht weiter ausbreiten. Daher geht die Infektion in eine Sättigung. Die exponentielle Wachstumsfunktion geht in eine Logistische Funktion über:
+# Anmerkung: Typischerweise ist nur der Beginn einer Epedemie mit exponentiellem Wachstum, denn irgendwann sind die Menschen immun oder verstorben und das Virus kann sich nicht weiter ausbreiten. Siehe: https://medium.com/data-for-science/epidemic-modeling-101-or-why-your-covid19-exponential-fits-are-wrong-97aa50c55f8
+# 
+# Daher geht die Infektion in eine Sättigung. Die exponentielle Wachstumsfunktion geht in eine Logistische Funktion über:
 # 
 # $P(t) = \cfrac{K}{1+\left(\frac{K-P_0}{P_0}\right)e^{-rt}}$
 # 
@@ -191,14 +195,14 @@ print('Modellparameter sind A=%.1f, B=%.3f' % (A, B))
 # 
 # Hier können wir die gefundenen Modellparameter aus dem exponentiellen Wachstum nutzen.
 
-# In[156]:
+# In[20]:
 
 
 infektionsrate = 0.7
 gesamtanzahl = 81465126
 
 
-# In[157]:
+# In[21]:
 
 
 def logistic_function(s, r=B, K=infektionsrate*gesamtanzahl, P0=A):
@@ -211,7 +215,7 @@ def logistic_function(s, r=B, K=infektionsrate*gesamtanzahl, P0=A):
 # 
 # R² score: the coefficient of determination
 
-# In[158]:
+# In[22]:
 
 
 r = r2_score(confirmed.loc[:today, 'confirmed'].values, confirmed.loc[:today,'predicted_exp'].values)
@@ -220,7 +224,7 @@ print('R2 = %.3f' % r)
 
 # ## Save the model for later use
 
-# In[159]:
+# In[23]:
 
 
 import pickle
@@ -238,7 +242,7 @@ print('Saved the Model to %s' % pklfilename)
 # 
 # Wir möchten die Vorhersage immer nur bis 31.03.2020 betreiben.
 
-# In[160]:
+# In[24]:
 
 
 #fd = 12 # days into the future
@@ -246,7 +250,7 @@ bezugstag = datetime.date(2020, 3, 31) # bis auf dieses Datum beziehen
 fd = (bezugstag - today).days
 
 
-# In[161]:
+# In[25]:
 
 
 # Create DataFrame in the Future
@@ -257,7 +261,7 @@ future = pd.DataFrame(data=days_in_future, index=dates, columns=['days'])
 future = future[:'2020-04-01']
 
 
-# In[162]:
+# In[26]:
 
 
 future = confirmed.append(future, sort=True)
@@ -265,26 +269,26 @@ future = confirmed.append(future, sort=True)
 
 # ### Predict the Future
 
-# In[163]:
+# In[27]:
 
 
 X_future = future['days'].values.reshape(-1, 1)
 
 
-# In[164]:
+# In[28]:
 
 
 logy_pred = clf.predict(X_future)
 future['predicted_exp'] = np.exp(logy_pred).astype('int')
 
 
-# In[165]:
+# In[29]:
 
 
 future['predicted_log'] = future.apply(logistic_function, axis=1)
 
 
-# In[166]:
+# In[30]:
 
 
 future
@@ -292,13 +296,13 @@ future
 
 # ## Future Plot
 
-# In[167]:
+# In[31]:
 
 
 title = 'Bestätigte Fälle und Vorhersage für Deutschland (Basierend auf CSSE COVID-19 Dataset)'
 
 
-# In[168]:
+# In[32]:
 
 
 ax = future['confirmed'].plot(label='Bestätigte COVID-19 Fälle', marker='o')
@@ -323,7 +327,7 @@ print('Saved the Figure')
 
 # ## Export as Excel
 
-# In[169]:
+# In[33]:
 
 
 xlsfile = './%s-Germany-Covid19-Prediction.xlsx' % confirmed.index[-1].strftime('%Y-%m-%d')
@@ -335,7 +339,7 @@ print('Saved the Excel to %s' % xlsfile)
 # 
 # We are using Bokeh to export an interactive website
 
-# In[170]:
+# In[34]:
 
 
 from bokeh.plotting import figure
@@ -347,18 +351,18 @@ from bokeh.resources import CDN
 from bokeh.palettes import inferno
 
 
-# In[171]:
+# In[35]:
 
 
 colors = inferno(6) # What else for this scenario ;)
 
 
-# In[172]:
+# In[36]:
 
 
 p = figure(tools="hover,save,pan,box_zoom,reset,wheel_zoom",
            x_axis_type="datetime",
-           title=title.replace(')', ' der John Hopkins University)'))
+           title=title.replace(')', ' der Johns Hopkins University)'))
 
 # Vertical line for Ausgangssperren
 vline = Span(location=ausgangssperren_timestamp_epoch,
@@ -412,7 +416,7 @@ div = Div(text="""<p>Quellcode: <a href="https://github.com/balzer82/covid-germa
             Disclaimer: Ich bin kein Epidemiologe oder Virologe, das ist keine offizielle Vorausberechnung! 
             Es wurde ein exponentielles Wachstumsmodell mittels Least Square auf die gemeldeten Fälle bis %s gefittet (grauer Bereich) 
             und eine zu erwartende Entwicklung für die nächsten Tage vorhergesagt (rote Linie). 
-            Die gelben Punkte zeigen die tatsächlichen Fallzahlen.</p>
+            Die gelben Punkte zeigen die tatsächlichen Fallzahlen. In der Realität ist es etwas komplexer, <a href='https://medium.com/data-for-science/epidemic-modeling-101-or-why-your-covid19-exponential-fits-are-wrong-97aa50c55f8'>siehe</a>.</p>
             <p><a href="https://cbcity.de/impressum">Impressum</a></p>""" % (today.strftime('%d.%m.%Y')))
 
 # Save
@@ -421,7 +425,7 @@ html = file_html(column(p, div, sizing_mode="stretch_both"), CDN, 'COVID-19 Pred
 
 # ## Style the Website
 
-# In[173]:
+# In[37]:
 
 
 head = '''
@@ -430,7 +434,7 @@ head = '''
 '''
 
 
-# In[174]:
+# In[38]:
 
 
 gtc = '''
@@ -447,14 +451,14 @@ gtc = '''
 '''
 
 
-# In[175]:
+# In[39]:
 
 
 websitehtml = html.replace('<body>', head)
 websitehtml = websitehtml.replace('</body>', gtc)
 
 
-# In[176]:
+# In[40]:
 
 
 with open('./html/index.html', 'w') as htmlfile:
